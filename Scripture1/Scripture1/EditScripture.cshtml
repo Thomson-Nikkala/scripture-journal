@@ -1,0 +1,106 @@
+﻿@{
+    var book = "";
+    var chapter = "";
+    var verse = "";
+    var note = "";
+    var id = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            id = Request.QueryString["ID"];
+            var db = Database.Open("WebPagesScriptures");
+            var dbCommand = "SELECT * FROM Scriptures WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, id);
+            if (row != null) {
+                book = row.Book;
+                chapter = row.Chapter;
+                verse = row.Verse;
+                note = row.Note;
+            } else {
+                Validation.AddFormError("No scripture was found for that ID.");
+            }
+        }
+        else {
+            Validation.AddFormError("No scripture was selected.");
+        }
+    }
+
+    if (IsPost)
+    {
+        Validation.RequireField("book", "Book is required.");
+        Validation.RequireField("chapter", "Chapter is required.");
+        Validation.RequireField("verse", "Verse is required.");
+        Validation.RequireField("note", "Note is required.");
+        Validation.RequireField("id", "Where's the scripture ID?");
+
+        book = Request.Form["book"];
+        chapter = Request.Form["chapter"];
+        verse = Request.Form["verse"];
+        note = Request.Form["note"];
+        id = Request.Form["id"];
+
+        if (Validation.IsValid())
+        {
+            var db = Database.Open("WebPagesScriptures");
+            var updateCommand = "UPDATE Scriptures SET Book=@0, Chapter=@1, Verse=@2, Note=@3 WHERE Id=@4";
+            db.Execute(updateCommand, book, chapter, verse, note, id);
+            Response.Redirect("~/Scripture1");
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Edit a Journal Entry</title>
+    <meta name="description" content="A simple scripture journal with notes.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="styles/normalize.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="scripts/modernizr-2.8.3.min.js"></script>
+</head>
+
+<header>Edit a Journal Entry</header>
+<body>
+    <main>
+    @Html.ValidationSummary()
+    <form method="post">
+        <fieldset> 
+            <legend>Update Scripture Information:</legend>
+
+            <p>
+                <label for="book">Book:</label>
+                <input type="text" name="book" value="@book" />
+            </p>
+
+            <p>
+                <label for="chapter">Chapter:</label>
+                <input type="text" name="chapter" value="@chapter" size="5" />
+            </p>
+
+            <p>
+                <label for="verse">Verse(s):</label>
+                <input type="text" name="verse" value="@verse" size="10" />
+            </p>
+
+            <p>
+                <label for="note">Note:</label>
+                <input type="text" name="note" value="@note" size="50"/>
+            </p>
+
+            <input type="hidden" name="id" value="@id" />
+
+            <p><input type="submit" name="buttonSubmit" value="Submit Changes" /></p>
+        </fieldset>
+    </form>
+</body>
+</main>
+</html>

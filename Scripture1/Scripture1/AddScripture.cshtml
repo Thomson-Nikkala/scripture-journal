@@ -1,0 +1,78 @@
+﻿@{
+    Validation.RequireField("book", "Book is required.");
+    Validation.RequireField("chapter", "Chapter is required.");
+    Validation.RequireField("verse", "Verse is required.");
+    Validation.RequireField("note", "Note is required.");
+
+    var book = "";
+    var chapter = "";
+    var verse = "";
+    var note = "";
+
+    if (IsPost && Validation.IsValid())
+    {
+        book = Request.Form["book"];
+        chapter = Request.Form["chapter"];
+        verse = Request.Form["verse"];
+        note = Request.Form["note"];
+        var db = Database.Open("WebPagesScriptures");
+        var insertCommand = "INSERT INTO Scriptures (Book, Chapter, Verse, Date, Note) VALUES(@0, @1, @2, @3, @4)";
+        db.Execute(insertCommand, book, chapter, verse, DateTime.Now, note);
+        Response.Redirect("~/Scripture1");
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Add A Scripture</title>
+    <meta name="description" content="A page to add a scripture journal entry.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="styles/normalize.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="scripts/modernizr-2.8.3.min.js"></script>
+</head>
+<body>
+    <header>Add a Scripture Journal Entry</header>
+    <main> 
+    @Html.ValidationSummary()
+    <form method="post">
+        <fieldset>
+            <legend>Scripture Information</legend>
+            <p>
+                <label for="book">Book:</label>
+                <input type="text" name="book" value="@Request.Form["book"]" />
+            </p>
+
+            <p>
+                <label for="chapter">Chapter:</label>
+                <input type="text" name="chapter" value="@Request.Form["chapter"]" />
+            </p>
+
+            <p>
+                <label for="verse">Verse(s):</label>
+                <input type="text" name="verse" value="@Request.Form["verse"]" />
+            </p>
+
+            <p>
+                <label for="verse">Note:</label>
+                <input type="text" name="note" value="@Request.Form["note"]" />
+            </p>
+
+            <p><input type="submit" name="buttonSubmit" value="Add Journal Entry" /></p>
+        </fieldset>
+    </form>
+    <footer></footer>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+    <script src="scripts/plugins.js"></script>
+    <script src="scripts/main.js"></script>
+        </main>
+</body>
+</html>
